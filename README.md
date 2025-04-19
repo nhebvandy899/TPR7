@@ -795,7 +795,7 @@
                  logoTextContainer.style.overflow = 'visible'; // Allow greeting to overflow
 
                  greetingText = document.createElement('div');
-                 greetingText.textContent = 'ថ្ងៃបុណ្យភ្ជុំបិណ្ឌ';
+                 greetingText.textContent = 'សួស្ដីឆ្នាំថ្មី';            // ប្ដូរថ្ងៃសួស្ដី
                  greetingText.style.position = 'absolute';
                  greetingText.style.left = '100%';
                  greetingText.style.marginLeft = '15px';
