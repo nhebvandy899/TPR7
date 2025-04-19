@@ -103,7 +103,8 @@
         .menu {
             list-style: none;
             display: flex;
-            position: relative;
+            position: relative; /* Needed for absolute positioning of mobile menu */
+            flex-grow: 1; /* Allow menu to take available space if needed */
         }
 
         .menu li {
@@ -164,14 +165,15 @@
         }
 
         /* Visitor Counter */
-        .visitor-counter {
+        .visitor-counter { /* Style for the container (used on desktop) */
             display: flex;
             align-items: center;
             color: white;
             font-size: 14px;
         }
 
-        .visitor-counter i {
+        .visitor-counter i, /* Target icon in both desktop and mobile */
+        .mobile-visitor-counter i {
             margin-right: 8px;
             font-size: 16px;
         }
@@ -188,7 +190,7 @@
             display: flex; /* Keep this */
             align-items: center; /* Keep this */
             white-space: nowrap; /* Keep this */
-            animation: marquee 30s linear infinite; /* Keep this */
+            animation: marquee 15s linear infinite; /* Keep this */
         }
 
         .marquee-content img.marquee-logo {
@@ -219,6 +221,7 @@
              top: 50%;
              right: 20px;
              transform: translateY(-50%);
+             z-index: 101; /* Ensure toggle is above menu */
         }
 
         /* Main Content Styles */
@@ -314,6 +317,26 @@
             color: #1a5276;
         }
 
+        /* --- START: Added/Modified CSS --- */
+
+        /* Style for Mobile Visitor Counter Item (within the dropdown) */
+        .mobile-visitor-counter {
+            display: none; /* Hide by default (on desktop) */
+            color: white;
+            padding: 15px 20px; /* Match other menu items */
+            font-size: 14px;
+            align-items: center; /* Align icon and text */
+            gap: 8px; /* Space between icon and text */
+            cursor: default; /* Indicate it's not clickable like a link */
+        }
+        /* No hover effect needed, or match menu item */
+        .mobile-visitor-counter:hover {
+             background-color: #2874a6; /* Keep same background on hover */
+        }
+
+        /* --- END: Added/Modified CSS --- */
+
+
         /* Responsive Styles */
         @media (max-width: 768px) {
             .header-container {
@@ -333,59 +356,75 @@
             }
 
             .nav-container {
-                position: relative;
+                position: relative; /* Keep relative positioning */
+                /* The flex settings from desktop are overridden by menu below */
             }
 
             .menu {
                 flex-direction: column;
-                display: none;
+                display: none; /* Hidden until toggled */
                 width: 100%;
-                position: absolute;
-                top: 100%;
+                position: absolute; /* Position below the nav bar */
+                top: 100%; /* Start right below the nav bar */
                 left: 0;
                 background-color: #2874a6;
-                z-index: 99;
+                z-index: 99; /* Below toggle but above content */
                 box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                 padding-bottom: 5px; /* Optional: space at the bottom */
             }
 
             .menu.active {
-                display: flex;
+                display: flex; /* Show the menu when active class is added */
             }
 
             .submenu {
-                position: static;
+                position: static; /* Submenu behaves normally within column */
                 width: 100%;
                 opacity: 1;
                 visibility: visible;
-                display: none;
+                display: none; /* Still hidden until parent is hovered */
                 box-shadow: none;
-                background-color: #1a5276;
+                background-color: #1a5276; /* Darker background for submenu */
             }
             .submenu a {
                 color: white;
-                padding-left: 30px;
+                padding-left: 30px; /* Indent submenu items */
             }
              .submenu a:hover {
                 background-color: #154360;
                 color: #fff;
-                padding-left: 35px;
+                padding-left: 35px; /* Indent further on hover */
             }
 
             .menu li:hover .submenu {
-                display: block;
+                display: block; /* Show submenu on hover */
             }
 
+             /* Hide the original right-aligned group (date/time, desktop counter) */
              .nav-right-items {
-                display: none; /* Hide date/time and counter when menu is collapsed */
+                display: none;
              }
 
+             /* --- START: Added/Modified CSS for Mobile --- */
+
+             /* Show the mobile counter LI only WHEN the menu is active */
+             .menu.active .mobile-visitor-counter {
+                 display: flex; /* Display it as a flex item */
+             }
+
+            /* Explicitly hide the desktop counter div on mobile */
+            .desktop-counter {
+                display: none !important; /* Use !important to be sure */
+            }
+
+             /* --- END: Added/Modified CSS for Mobile --- */
 
             .report-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr; /* Stack report cards */
             }
 
             .statistics {
-                flex-direction: column;
+                flex-direction: column; /* Stack stat items */
             }
         }
     </style>
@@ -407,6 +446,7 @@
             <div class="menu-toggle" id="menu-toggle">☰</div>
         </div>
 
+        <!-- === START: MODIFIED NAV SECTION === -->
         <nav>
             <div class="nav-container">
                 <!-- Main Menu -->
@@ -423,9 +463,17 @@
                     <li><a href="https://script.google.com/macros/s/AKfycbyS2gwxXs36X3kI7TmhQAisTkgd-4L1MwppIO0Vas0prVYwTvwcpndmme2ZSsONKtWoQA/exec">សមាគមមនុស្សចាស់</a></li>
                     <li><a href="#">បញ្ជូលទិន្នន័យសមាជិកបក្ស</a></li>
                     <li><a href="https://t.me/CTPBMC">ព័ត៌មានថ្មី</a></li>
+
+                    <!-- Visitor Counter for Mobile View - Added Here -->
+                    <li class="mobile-visitor-counter">
+                         <i class="fas fa-users"></i>
+                         <span class="visitor-count-display">កំពុងគណនា...</span> <!-- Use class -->
+                    </li>
+                    <!-- End Mobile Visitor Counter -->
+
                 </ul>
 
-                <!-- Group for Date/Time and Visitor Counter -->
+                <!-- Group for Date/Time and Visitor Counter (Desktop) -->
                 <div class="nav-right-items">
                     <!-- Date/Time Moved Here -->
                     <div class="datetime-display">
@@ -433,14 +481,15 @@
                         <div class="time" id="current-time">ម៉ោង...</div>
                     </div>
 
-                    <!-- Visitor Counter -->
-                    <div class="visitor-counter">
+                    <!-- Visitor Counter (Desktop) -->
+                    <div class="visitor-counter desktop-counter"> <!-- Added desktop-counter class -->
                         <i class="fas fa-users"></i>
-                        <span id="visitor-count">កំពុងគណនា...</span>
+                        <span class="visitor-count-display">កំពុងគណនា...</span> <!-- Changed ID to class -->
                     </div>
                 </div>
             </div>
         </nav>
+        <!-- === END: MODIFIED NAV SECTION === -->
     </header>
 
     <div class="marquee-container">
@@ -532,18 +581,18 @@
             menu.classList.toggle('active');
         });
 
-        // Logo animation
-        const logo = document.getElementById('logo-img');
-        if (logo) {
-            logo.addEventListener('mouseover', function() {
+        // Logo animation (Non-Greeting part)
+        const logoImgElement = document.getElementById('logo-img'); // Renamed variable to avoid conflict
+        if (logoImgElement) {
+            logoImgElement.addEventListener('mouseover', function() {
                 this.style.transform = 'scale(1.1)';
                 this.style.transition = 'transform 0.3s ease';
             });
-            logo.addEventListener('mouseout', function() {
+            logoImgElement.addEventListener('mouseout', function() {
                 this.style.transform = 'scale(1)';
             });
         } else {
-            console.error("Logo element not found.");
+            console.error("Logo image element not found.");
         }
 
 
@@ -557,59 +606,67 @@
         }
 
 
-            // --- START: VISITOR COUNTER FUNCTION (INCREMENTS ONCE PER SESSION) ---
-    function updateVisitorCounter() {
-        // *** សំខាន់! សូមដាក់ URL នៃ Web App របស់អ្នកនៅទីនេះ ***
-        const counterWebAppUrl = "https://script.google.com/macros/s/AKfycbxC7uFl2X96AbTYYCTPmO0x1T4it6-Jj_TWBqBqj9Vbvjp1WqPaYHM1lSFfMZ0JuVNK/exec"; // <--- សូមប្តូរ URL នេះ!
+        // --- START: MODIFIED VISITOR COUNTER FUNCTION ---
+        function updateVisitorCounter() {
+            // *** សំខាន់! សូមដាក់ URL នៃ Web App របស់អ្នកនៅទីនេះ ***
+            const counterWebAppUrl = "https://script.google.com/macros/s/AKfycbxC7uFl2X96AbTYYCTPmO0x1T4it6-Jj_TWBqBqj9Vbvjp1WqPaYHM1lSFfMZ0JuVNK/exec"; // <--- សូមប្តូរ URL នេះ!
 
-        const countElement = document.getElementById('visitor-count');
-        countElement.textContent = 'កំពុង​ផ្ទុក...'; // Loading text
+            // Select ALL elements displaying the count using the CLASS
+            const countElements = document.querySelectorAll('.visitor-count-display');
+            if (countElements.length === 0) {
+                console.error("Element with class 'visitor-count-display' not found.");
+                return; // Exit if no elements found
+            }
 
-        const sessionKey = 'sessionVisitedCounter';
-        let apiUrl;
+            // Set loading text on all found elements
+            countElements.forEach(el => el.textContent = 'កំពុង​ផ្ទុក...');
 
-        // Check if this session has already visited
-        if (!sessionStorage.getItem(sessionKey)) {
-            // First visit in this session: Mark as visited and call API to increment
-            sessionStorage.setItem(sessionKey, 'true');
-            apiUrl = counterWebAppUrl + '?action=increment'; // Add action parameter
-            console.log("First visit this session. Incrementing count.");
-        } else {
-            // Subsequent visit in this session: Just get the current count
-            apiUrl = counterWebAppUrl + '?action=getCount'; // Add different action parameter (or just base URL if script defaults to getCount)
-            console.log("Subsequent visit this session. Getting count only.");
-        }
+            const sessionKey = 'sessionVisitedCounter';
+            let apiUrl;
 
-        // Fetch the count from the API (either incrementing or just getting)
-        fetch(apiUrl)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Network response was not ok: ${response.statusText}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.error) {
-                    console.error("Error from Counter Script:", data.error);
-                    countElement.textContent = 'បរាជ័យ'; // Failed text
-                } else if (data.visitorCount !== undefined && data.visitorCount !== -1) {
-                    const count = Number(data.visitorCount);
-                    if (!isNaN(count)) {
-                        countElement.textContent = count.toLocaleString('km-KH');
-                    } else {
-                        countElement.textContent = 'ទិន្នន័យ​ខុស'; // Invalid data text
+            // Check if this session has already visited
+            if (!sessionStorage.getItem(sessionKey)) {
+                // First visit in this session: Mark as visited and call API to increment
+                sessionStorage.setItem(sessionKey, 'true');
+                apiUrl = counterWebAppUrl + '?action=increment'; // Add action parameter
+                console.log("First visit this session. Incrementing count.");
+            } else {
+                // Subsequent visit in this session: Just get the current count
+                apiUrl = counterWebAppUrl + '?action=getCount'; // Add different action parameter
+                console.log("Subsequent visit this session. Getting count only.");
+            }
+
+            // Fetch the count from the API (either incrementing or just getting)
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Network response was not ok: ${response.statusText}`);
                     }
-                } else {
-                    console.error("Unexpected data format received:", data);
-                    countElement.textContent = 'ទម្រង់​ខុស'; // Wrong format text
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching visitor count:', error);
-                countElement.textContent = 'បរាជ័យ'; // Failed text
-            });
-    }
-    // --- END: VISITOR COUNTER FUNCTION ---
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error) {
+                        console.error("Error from Counter Script:", data.error);
+                        countElements.forEach(el => el.textContent = 'បរាជ័យ'); // Failed text on all
+                    } else if (data.visitorCount !== undefined && data.visitorCount !== -1) {
+                        const count = Number(data.visitorCount);
+                        if (!isNaN(count)) {
+                            // Update ALL elements with the count
+                            countElements.forEach(el => el.textContent = count.toLocaleString('km-KH'));
+                        } else {
+                            countElements.forEach(el => el.textContent = 'ទិន្នន័យ​ខុស'); // Invalid data on all
+                        }
+                    } else {
+                        console.error("Unexpected data format received:", data);
+                        countElements.forEach(el => el.textContent = 'ទម្រង់​ខុស'); // Wrong format on all
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching visitor count:', error);
+                    countElements.forEach(el => el.textContent = 'បរាជ័យ'); // Failed text on all
+                });
+        }
+        // --- END: MODIFIED VISITOR COUNTER FUNCTION ---
 
 
         // --- START: FETCH STATISTICS FUNCTION ---
@@ -691,8 +748,12 @@
 
             const timeHTML = `ម៉ោង ${hourStr}<span class="time-minutes-seconds">:${minuteStr}:${secondStr}</span> ${ampm}`;
 
-            document.getElementById('current-date').textContent = dateStr;
-            document.getElementById('current-time').innerHTML = timeHTML;
+            // Check if elements exist before updating
+            const dateElement = document.getElementById('current-date');
+            const timeElement = document.getElementById('current-time');
+            if (dateElement) dateElement.textContent = dateStr;
+            if (timeElement) timeElement.innerHTML = timeHTML;
+
 
             setTimeout(updateDateTime, 1000);
         }
@@ -705,74 +766,114 @@
         updateDateTime(); // Start the date/time update loop
 
 
-        // --- START: LOGO ANIMATION SCRIPT ---
-         document.addEventListener('DOMContentLoaded', function() {
-             const logo = document.getElementById('logo-img');
+        // --- START: LOGO ANIMATION SCRIPT (Greeting Text + Stars) ---
+        document.addEventListener('DOMContentLoaded', function() {
+             const logo = document.getElementById('logo-img'); // Target the image itself
+             const logoTextContainer = document.querySelector('.logo-text'); // Get the container for the title text
 
              if (!logo) {
                  console.error("រកមិនឃើញឡូហ្គោ! ពិនិត្យ ID ឡូហ្គោអ្នក។");
-                 return;
+                 // return; // Don't stop everything if logo image fails, maybe just stars/greeting
              }
-             const animationContainer = document.createElement('div');
-             animationContainer.style.position = 'relative';
-             animationContainer.style.display = 'inline-block'; // Important for positioning children
-             logo.parentNode.insertBefore(animationContainer, logo);
-             animationContainer.appendChild(logo);
+             if (!logoTextContainer) {
+                 console.error("រកមិនឃើញ .logo-text container!");
+                 // return; // Don't stop everything if text container fails
+             }
 
-             const greetingText = document.createElement('div');
-             greetingText.textContent = 'សួស្ដីឆ្នាំថ្មី';
-             greetingText.style.position = 'absolute';
-             greetingText.style.left = '-120px';
-             greetingText.style.top = '50%';
-             greetingText.style.transform = 'translateY(-50%)';
-             greetingText.style.color = '#ecf0f1';
-             greetingText.style.fontSize = '16px';
-             greetingText.style.fontWeight = 'bold';
-             greetingText.style.fontFamily = "'Khmer OS Muol Light', sans-serif";
-             greetingText.style.opacity = '0.8';
-             greetingText.style.transition = 'all 1.5s ease-in-out';
-             greetingText.style.pointerEvents = 'none';
-             greetingText.style.zIndex = '100';
-             greetingText.style.textShadow = '0 0 5px #e74c3c';
-             greetingText.style.whiteSpace = 'nowrap';
-             animationContainer.appendChild(greetingText);
+             // Container for stars, remains around the logo image (if logo exists)
+             let starAnimationContainer = null;
+             if (logo) {
+                 starAnimationContainer = document.createElement('div');
+                 starAnimationContainer.style.position = 'relative';
+                 starAnimationContainer.style.display = 'inline-block';
+                 logo.parentNode.insertBefore(starAnimationContainer, logo);
+                 starAnimationContainer.appendChild(logo);
+             }
 
+             // Create and position the greeting text (if text container exists)
+             let greetingText = null;
+             if (logoTextContainer) {
+                 logoTextContainer.style.position = 'relative'; // Needed for absolute positioning
+                 logoTextContainer.style.overflow = 'visible'; // Allow greeting to overflow
+
+                 greetingText = document.createElement('div');
+                 greetingText.textContent = 'សួស្ដីឆ្នាំថ្មី';
+                 greetingText.style.position = 'absolute';
+                 greetingText.style.left = '100%';
+                 greetingText.style.marginLeft = '15px';
+                 greetingText.style.top = '50%';
+                 greetingText.style.transform = 'translateY(-50%)';
+                 greetingText.style.color = '#ecf0f1';
+                 greetingText.style.fontSize = '16px';
+                 greetingText.style.fontWeight = 'bold';
+                 greetingText.style.fontFamily = "'Khmer OS Muol Light', sans-serif";
+                 greetingText.style.opacity = '0.8';
+                 greetingText.style.transition = 'all 1.5s ease-in-out';
+                 greetingText.style.pointerEvents = 'none';
+                 greetingText.style.zIndex = '100';
+                 greetingText.style.textShadow = '0 0 5px #e74c3c';
+                 greetingText.style.whiteSpace = 'nowrap';
+
+                 logoTextContainer.appendChild(greetingText);
+             }
+
+             // Animation function for the greeting text (only if it was created)
              function animateGreetingText() {
-                greetingText.style.opacity = '0.8';
-                greetingText.style.top = '120%';
-                greetingText.style.left = '-100px';
+                 if (!greetingText) return; // Don't run if greetingText doesn't exist
 
+                // Reset to starting visible position
+                greetingText.style.opacity = '0.8';
+                greetingText.style.top = '50%';
+                greetingText.style.left = '100%';
+                greetingText.style.marginLeft = '15px';
+
+                // Animation steps
                 setTimeout(() => {
-                    greetingText.style.top = '-20%';
-                    greetingText.style.left = '-140px';
+                    if(greetingText) {
+                        greetingText.style.top = '120%';
+                        greetingText.style.marginLeft = '35px';
+                    }
                 }, 1600);
 
                 setTimeout(() => {
-                    greetingText.style.opacity = '0';
+                     if(greetingText) {
+                        greetingText.style.top = '-20%';
+                        greetingText.style.marginLeft = '-5px';
+                     }
                 }, 3100);
 
                 setTimeout(() => {
-                    greetingText.style.top = '50%';
-                    greetingText.style.left = '-200px';
-                    greetingText.style.opacity = '0';
-                }, 3300);
+                     if(greetingText) {
+                         greetingText.style.opacity = '0';
+                     }
+                }, 4600);
 
+                // Reset position while hidden
                 setTimeout(() => {
-                     greetingText.style.left = '-120px';
-                     greetingText.style.opacity = '0.8';
-                 }, 3500);
+                     if(greetingText) {
+                        greetingText.style.top = '50%';
+                        greetingText.style.left = '100%';
+                        greetingText.style.marginLeft = '-50px';
+                        greetingText.style.opacity = '0';
+                     }
+                }, 4800);
 
+                 // Loop the animation
                 setTimeout(animateGreetingText, 7000);
              }
 
+             // --- Star Animation Logic ---
              function createFallingStar() {
+                 // Only create stars if the container exists
+                 if (!starAnimationContainer) return;
+
                  const star = document.createElement('div');
                  star.innerHTML = '★';
                  star.style.position = 'absolute';
                  star.style.color = ['#FFD700', '#FF0000', '#00FF00', '#FFFFFF', '#FFA500', '#FF69B4', '#00FFFF', '#FF00FF'][Math.floor(Math.random() * 8)];
                  star.style.fontSize = Math.random() * 15 + 10 + 'px';
                  star.style.top = '-30px';
-                 star.style.left = Math.random() * (animationContainer.offsetWidth + 40) - 20 + 'px';
+                 star.style.left = Math.random() * (starAnimationContainer.offsetWidth + 40) - 20 + 'px'; // Relative to star container
                  star.style.opacity = '0';
                  star.style.transition = `all ${Math.random() * 1.5 + 1}s linear`;
                  star.style.pointerEvents = 'none';
@@ -780,11 +881,11 @@
                  star.style.transform = `rotate(${Math.random() * 360}deg)`;
                  star.style.filter = 'drop-shadow(0 0 3px currentColor)';
 
-                 animationContainer.appendChild(star);
+                 starAnimationContainer.appendChild(star); // Append to the star container
 
                  setTimeout(() => {
                      star.style.opacity = '1';
-                     star.style.transform = `translateY(${animationContainer.offsetHeight + 50}px) rotate(${Math.random() * 720 + 360}deg)`;
+                     star.style.transform = `translateY(${starAnimationContainer.offsetHeight + 50}px) rotate(${Math.random() * 720 + 360}deg)`;
                      star.style.opacity = '0';
                  }, 10);
 
@@ -792,6 +893,7 @@
              }
 
              function autoDropStars() {
+                  if (!starAnimationContainer) return; // Don't run if no container
                  setInterval(() => {
                      for (let i = 0; i < 2; i++) {
                          setTimeout(createFallingStar, i * 150);
@@ -799,14 +901,20 @@
                  }, 800);
              }
 
-             setTimeout(animateGreetingText, 1000);
-             setTimeout(autoDropStars, 500);
+             // Start animations (only if elements exist)
+            if (greetingText) setTimeout(animateGreetingText, 1000);
+            if (starAnimationContainer) setTimeout(autoDropStars, 500);
 
-             logo.addEventListener('click', function() {
-                 for (let i = 0; i < 30; i++) {
-                     setTimeout(createFallingStar, i * 20);
-                 }
-             });
+
+             // Trigger stars on logo click (only if logo exists)
+             if (logo) {
+                 logo.addEventListener('click', function() {
+                     if (!starAnimationContainer) return; // Check again just in case
+                     for (let i = 0; i < 30; i++) {
+                         setTimeout(createFallingStar, i * 20);
+                     }
+                 });
+             }
          });
          // --- END: LOGO ANIMATION SCRIPT ---
 
