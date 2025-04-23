@@ -40,7 +40,7 @@
             display: flex;
             align-items: center;
         }
-
+  
         .logo {
             display: flex;
             align-items: center;
