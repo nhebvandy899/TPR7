@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="km">
 <head>
     <meta charset="UTF-8">
@@ -11,6 +12,7 @@
             box-sizing: border-box;
             font-family: 'Khmer OS', 'Arial', sans-serif;
         }
+
         body {
             background-color: #f5f5f5;
             color: #333;
@@ -188,7 +190,8 @@
             display: flex; /* Keep this */
             align-items: center; /* Keep this */
             white-space: nowrap; /* Keep this */
-            animation: marquee 15s linear infinite; /* Keep this */
+            /* Default animation for desktop */
+            animation: marquee 15s linear infinite;
         }
 
         .marquee-content img.marquee-logo {
@@ -203,9 +206,10 @@
             color: #1a5276;
         }
 
+        /* Default Keyframes for Desktop */
         @keyframes marquee {
             0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); } /* Adjust as needed */
+            100% { transform: translateX(-100%); } /* Standard scroll */
         }
 
 
@@ -315,8 +319,6 @@
             color: #1a5276;
         }
 
-        /* --- START: Added/Modified CSS --- */
-
         /* Style for Mobile Visitor Counter Item (within the dropdown) */
         .mobile-visitor-counter {
             display: none; /* Hide by default (on desktop) */
@@ -331,8 +333,6 @@
         .mobile-visitor-counter:hover {
              background-color: #2874a6; /* Keep same background on hover */
         }
-
-        /* --- END: Added/Modified CSS --- */
 
 
         /* Responsive Styles */
@@ -355,7 +355,6 @@
 
             .nav-container {
                 position: relative; /* Keep relative positioning */
-                /* The flex settings from desktop are overridden by menu below */
             }
 
             .menu {
@@ -403,8 +402,6 @@
                 display: none;
              }
 
-             /* --- START: Added/Modified CSS for Mobile --- */
-
              /* Show the mobile counter LI only WHEN the menu is active */
              .menu.active .mobile-visitor-counter {
                  display: flex; /* Display it as a flex item */
@@ -415,8 +412,6 @@
                 display: none !important; /* Use !important to be sure */
             }
 
-             /* --- END: Added/Modified CSS for Mobile --- */
-
             .report-grid {
                 grid-template-columns: 1fr; /* Stack report cards */
             }
@@ -424,7 +419,28 @@
             .statistics {
                 flex-direction: column; /* Stack stat items */
             }
-        }
+
+            /* --- START: Mobile Marquee Adjustments --- */
+            .marquee-content {
+                /* Apply a mobile-specific animation name */
+                animation-name: marquee-mobile;
+                /* Optional: Adjust duration for potentially longer travel distance if needed */
+                /* animation-duration: 20s; */ /* Uncomment and adjust if you want it slower */
+            }
+
+            /* Define the keyframes specifically for mobile */
+            @keyframes marquee-mobile {
+                0% {
+                    transform: translateX(100%); /* Start off-screen right */
+                }
+                100% {
+                    /* Move further left - adjust value as needed */
+                    transform: translateX(-180%);
+                }
+            }
+            /* --- END: Mobile Marquee Adjustments --- */
+
+        } /* Closing brace of the @media query */
     </style>
     <!-- Font Awesome for visitor icon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -444,7 +460,6 @@
             <div class="menu-toggle" id="menu-toggle">☰</div>
         </div>
 
-        <!-- === START: MODIFIED NAV SECTION === -->
         <nav>
             <div class="nav-container">
                 <!-- Main Menu -->
@@ -462,32 +477,26 @@
                     <li><a href="#">បញ្ជូលទិន្នន័យសមាជិកបក្ស</a></li>
                     <li><a href="https://t.me/CTPBMC">ព័ត៌មានថ្មី</a></li>
 
-                    <!-- Visitor Counter for Mobile View - Added Here -->
+                    <!-- Visitor Counter for Mobile View -->
                     <li class="mobile-visitor-counter">
                          <i class="fas fa-users"></i>
-                         <span class="visitor-count-display">កំពុងគណនា...</span> <!-- Use class -->
+                         <span class="visitor-count-display">កំពុងគណនា...</span>
                     </li>
-                    <!-- End Mobile Visitor Counter -->
-
                 </ul>
 
                 <!-- Group for Date/Time and Visitor Counter (Desktop) -->
                 <div class="nav-right-items">
-                    <!-- Date/Time Moved Here -->
                     <div class="datetime-display">
                         <div class="date" id="current-date">ថ្ងៃ... ទី... ខែ... ឆ្នាំ...</div>
                         <div class="time" id="current-time">ម៉ោង...</div>
                     </div>
-
-                    <!-- Visitor Counter (Desktop) -->
-                    <div class="visitor-counter desktop-counter"> <!-- Added desktop-counter class -->
+                    <div class="visitor-counter desktop-counter">
                         <i class="fas fa-users"></i>
-                        <span class="visitor-count-display">កំពុងគណនា...</span> <!-- Changed ID to class -->
+                        <span class="visitor-count-display">កំពុងគណនា...</span>
                     </div>
                 </div>
             </div>
         </nav>
-        <!-- === END: MODIFIED NAV SECTION === -->
     </header>
 
     <div class="marquee-container">
@@ -594,74 +603,56 @@
         }
 
 
-        // Marquee animation
+        // Marquee animation element check
         const marqueeContent = document.querySelector('.marquee-content');
-        if (marqueeContent) {
-           // Potentially clone content if very short, but often the animation handles it
-           // if (marqueeContent.scrollWidth > marqueeContent.offsetWidth) {
-           //     // Clone if content wider than container
-           // }
+        if (!marqueeContent) {
+            console.error("Marquee content element not found.");
         }
 
 
         // --- START: MODIFIED VISITOR COUNTER FUNCTION ---
         function updateVisitorCounter() {
-            // *** សំខាន់! សូមដាក់ URL នៃ Web App របស់អ្នកនៅទីនេះ ***
-            const counterWebAppUrl = "https://script.google.com/macros/s/AKfycbxC7uFl2X96AbTYYCTPmO0x1T4it6-Jj_TWBqBqj9Vbvjp1WqPaYHM1lSFfMZ0JuVNK/exec"; // <--- សូមប្តូរ URL នេះ!
-
-            // Select ALL elements displaying the count using the CLASS
+            const counterWebAppUrl = "https://script.google.com/macros/s/AKfycbxC7uFl2X96AbTYYCTPmO0x1T4it6-Jj_TWBqBqj9Vbvjp1WqPaYHM1lSFfMZ0JuVNK/exec";
             const countElements = document.querySelectorAll('.visitor-count-display');
             if (countElements.length === 0) {
                 console.error("Element with class 'visitor-count-display' not found.");
-                return; // Exit if no elements found
+                return;
             }
-
-            // Set loading text on all found elements
             countElements.forEach(el => el.textContent = 'កំពុង​ផ្ទុក...');
-
             const sessionKey = 'sessionVisitedCounter';
             let apiUrl;
-
-            // Check if this session has already visited
             if (!sessionStorage.getItem(sessionKey)) {
-                // First visit in this session: Mark as visited and call API to increment
                 sessionStorage.setItem(sessionKey, 'true');
-                apiUrl = counterWebAppUrl + '?action=increment'; // Add action parameter
+                apiUrl = counterWebAppUrl + '?action=increment';
                 console.log("First visit this session. Incrementing count.");
             } else {
-                // Subsequent visit in this session: Just get the current count
-                apiUrl = counterWebAppUrl + '?action=getCount'; // Add different action parameter
+                apiUrl = counterWebAppUrl + '?action=getCount';
                 console.log("Subsequent visit this session. Getting count only.");
             }
-
-            // Fetch the count from the API (either incrementing or just getting)
             fetch(apiUrl)
                 .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`Network response was not ok: ${response.statusText}`);
-                    }
+                    if (!response.ok) throw new Error(`Network response was not ok: ${response.statusText}`);
                     return response.json();
                 })
                 .then(data => {
                     if (data.error) {
                         console.error("Error from Counter Script:", data.error);
-                        countElements.forEach(el => el.textContent = 'បរាជ័យ'); // Failed text on all
+                        countElements.forEach(el => el.textContent = 'បរាជ័យ');
                     } else if (data.visitorCount !== undefined && data.visitorCount !== -1) {
                         const count = Number(data.visitorCount);
                         if (!isNaN(count)) {
-                            // Update ALL elements with the count
                             countElements.forEach(el => el.textContent = count.toLocaleString('km-KH'));
                         } else {
-                            countElements.forEach(el => el.textContent = 'ទិន្នន័យ​ខុស'); // Invalid data on all
+                            countElements.forEach(el => el.textContent = 'ទិន្នន័យ​ខុស');
                         }
                     } else {
                         console.error("Unexpected data format received:", data);
-                        countElements.forEach(el => el.textContent = 'ទម្រង់​ខុស'); // Wrong format on all
+                        countElements.forEach(el => el.textContent = 'ទម្រង់​ខុស');
                     }
                 })
                 .catch(error => {
                     console.error('Error fetching visitor count:', error);
-                    countElements.forEach(el => el.textContent = 'បរាជ័យ'); // Failed text on all
+                    countElements.forEach(el => el.textContent = 'បរាជ័យ');
                 });
         }
         // --- END: MODIFIED VISITOR COUNTER FUNCTION ---
@@ -669,116 +660,88 @@
 
         // --- START: FETCH STATISTICS FUNCTION ---
         function fetchMemberStatistics() {
-            // *** PASTE YOUR DEPLOYED WEB APP URL FOR STATISTICS HERE ***
             const webAppUrl = "https://script.google.com/macros/s/AKfycbymzOB1xSDowUX6sLbrFX5HjMSM0B6k1VA59qmOmGAqsqyxvFFwhcnZPyxDNzQKKpv2ug/exec";
-
-            // Select all stat elements initially to set loading text
             const statElements = document.querySelectorAll('.statistics .number');
-            statElements.forEach(el => el.textContent = 'កំពុង​ផ្ទុក...'); // Loading text
-
+            statElements.forEach(el => el.textContent = 'កំពុង​ផ្ទុក...');
             fetch(webAppUrl)
                 .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`Network response was not ok: ${response.statusText}`);
-                    }
+                    if (!response.ok) throw new Error(`Network response was not ok: ${response.statusText}`);
                     return response.json();
                 })
                 .then(data => {
-                    console.log("Data received:", data); // For debugging
-
+                    console.log("Data received:", data);
                     if (data.error) {
                         console.error("Error from Google Apps Script:", data.error);
                         statElements.forEach(el => el.textContent = 'Error');
                         return;
                     }
-
-                    // Update each statistic element based on the ID from the sheet
                     for (const id in data) {
                         const element = document.getElementById(id);
                         if (element) {
                             const value = Number(data[id]);
-                            if (!isNaN(value)) {
-                                element.textContent = value.toLocaleString('km-KH');
-                            } else {
-                                element.textContent = data[id]; // Keep as string if not a number
-                            }
+                            element.textContent = !isNaN(value) ? value.toLocaleString('km-KH') : data[id];
                         } else {
                             console.warn(`HTML element with ID '${id}' not found.`);
                         }
                     }
-
-                    // Handle cases where an ID might exist in HTML but not in sheet data
                     statElements.forEach(el => {
-                        if (el.textContent === 'កំពុង​ផ្ទុក...') {
-                            el.textContent = 'N/A';
-                        }
+                        if (el.textContent === 'កំពុង​ផ្ទុក...') el.textContent = 'N/A';
                     });
                 })
                 .catch(error => {
                     console.error('Error fetching or processing statistics:', error);
-                    statElements.forEach(el => el.textContent = 'បរាជ័យ'); // Failed text
+                    statElements.forEach(el => el.textContent = 'បរាជ័យ');
                 });
         }
         // --- END: FETCH STATISTICS FUNCTION ---
 
 
-        // --- START: DATE/TIME UPDATE FUNCTION ---
+        // --- START: DATE/TIME UPDATE FUNCTION (MODIFIED YEAR FORMAT) ---
         function updateDateTime() {
             const now = new Date();
             const days = ['ថ្ងៃអាទិត្យ', 'ថ្ងៃច័ន្ទ', 'ថ្ងៃអង្គារ', 'ថ្ងៃពុធ', 'ថ្ងៃព្រហស្បតិ៍', 'ថ្ងៃសុក្រ', 'ថ្ងៃសៅរ៍'];
             const months = ['មករា', 'កុម្ភៈ', 'មីនា', 'មេសា', 'ឧសភា', 'មិថុនា', 'កក្កដា', 'សីហា', 'កញ្ញា', 'តុលា', 'វិច្ឆិកា', 'ធ្នូ'];
             const dayName = days[now.getDay()];
             const monthName = months[now.getMonth()];
-            const dateStr = `${dayName} ទី${now.getDate().toLocaleString('km-KH')} ខែ${monthName} ឆ្នាំ${now.getFullYear().toLocaleString('km-KH')}`;
+
+            // *** MODIFICATION HERE: Removed .toLocaleString('km-KH') from getFullYear() ***
+            const dateStr = `${dayName} ទី${now.getDate().toLocaleString('km-KH')} ខែ${monthName} ឆ្នាំ${now.getFullYear()}`; // Get year directly
 
             let hours = now.getHours();
             let minutes = now.getMinutes();
             let seconds = now.getSeconds();
             let ampm = hours >= 12 ? 'ល្ងាច' : 'ព្រឹក';
             hours = hours % 12;
-            hours = hours ? hours : 12; // Handle midnight (0 becomes 12)
+            hours = hours ? hours : 12;
             minutes = minutes < 10 ? '0' + minutes : minutes;
             seconds = seconds < 10 ? '0' + seconds : seconds;
-
-            const hourStr = hours.toLocaleString('km-KH');
-            const minuteStr = minutes.toLocaleString('km-KH');
-            const secondStr = seconds.toLocaleString('km-KH');
-
+            const hourStr = hours.toLocaleString('km-KH'); // Keep localeString for time parts
+            const minuteStr = minutes.toLocaleString('km-KH'); // Keep localeString for time parts
+            const secondStr = seconds.toLocaleString('km-KH'); // Keep localeString for time parts
             const timeHTML = `ម៉ោង ${hourStr}<span class="time-minutes-seconds">:${minuteStr}:${secondStr}</span> ${ampm}`;
 
-            // Check if elements exist before updating
             const dateElement = document.getElementById('current-date');
             const timeElement = document.getElementById('current-time');
             if (dateElement) dateElement.textContent = dateStr;
             if (timeElement) timeElement.innerHTML = timeHTML;
-
-
             setTimeout(updateDateTime, 1000);
         }
         // --- END: DATE/TIME UPDATE FUNCTION ---
 
 
         // --- Initialize page functions ---
-        updateVisitorCounter(); // Update counter on page load (fetches from server)
-        fetchMemberStatistics(); // Fetch stats from Google Sheet on page load
-        updateDateTime(); // Start the date/time update loop
+        updateVisitorCounter();
+        fetchMemberStatistics();
+        updateDateTime();
 
 
         // --- START: LOGO ANIMATION SCRIPT (Greeting Text + Stars) ---
         document.addEventListener('DOMContentLoaded', function() {
-             const logo = document.getElementById('logo-img'); // Target the image itself
-             const logoTextContainer = document.querySelector('.logo-text'); // Get the container for the title text
+             const logo = document.getElementById('logo-img');
+             const logoTextContainer = document.querySelector('.logo-text');
+             if (!logo) console.error("រកមិនឃើញឡូហ្គោ! ពិនិត្យ ID ឡូហ្គោអ្នក។");
+             if (!logoTextContainer) console.error("រកមិនឃើញ .logo-text container!");
 
-             if (!logo) {
-                 console.error("រកមិនឃើញឡូហ្គោ! ពិនិត្យ ID ឡូហ្គោអ្នក។");
-                 // return; // Don't stop everything if logo image fails, maybe just stars/greeting
-             }
-             if (!logoTextContainer) {
-                 console.error("រកមិនឃើញ .logo-text container!");
-                 // return; // Don't stop everything if text container fails
-             }
-
-             // Container for stars, remains around the logo image (if logo exists)
              let starAnimationContainer = null;
              if (logo) {
                  starAnimationContainer = document.createElement('div');
@@ -788,129 +751,67 @@
                  starAnimationContainer.appendChild(logo);
              }
 
-             // Create and position the greeting text (if text container exists)
              let greetingText = null;
              if (logoTextContainer) {
-                 logoTextContainer.style.position = 'relative'; // Needed for absolute positioning
-                 logoTextContainer.style.overflow = 'visible'; // Allow greeting to overflow
-
+                 logoTextContainer.style.position = 'relative';
+                 logoTextContainer.style.overflow = 'visible';
                  greetingText = document.createElement('div');
-                 greetingText.textContent = 'សួស្ដីឆ្នាំថ្មី';            // ប្ដូរថ្ងៃសួស្ដី
-                 greetingText.style.position = 'absolute';
-                 greetingText.style.left = '100%';
-                 greetingText.style.marginLeft = '15px';
-                 greetingText.style.top = '50%';
-                 greetingText.style.transform = 'translateY(-50%)';
-                 greetingText.style.color = '#ecf0f1';
-                 greetingText.style.fontSize = '16px';
-                 greetingText.style.fontWeight = 'bold';
-                 greetingText.style.fontFamily = "'Khmer OS Muol Light', sans-serif";
-                 greetingText.style.opacity = '0.8';
-                 greetingText.style.transition = 'all 1.5s ease-in-out';
-                 greetingText.style.pointerEvents = 'none';
-                 greetingText.style.zIndex = '100';
-                 greetingText.style.textShadow = '0 0 5px #e74c3c';
-                 greetingText.style.whiteSpace = 'nowrap';
-
+                 greetingText.textContent = 'សួស្ដីឆ្នាំថ្មី';
+                 Object.assign(greetingText.style, {
+                    position: 'absolute', left: '100%', marginLeft: '15px', top: '50%',
+                    transform: 'translateY(-50%)', color: '#ecf0f1', fontSize: '16px',
+                    fontWeight: 'bold', fontFamily: "'Khmer OS Muol Light', sans-serif",
+                    opacity: '0.8', transition: 'all 1.5s ease-in-out', pointerEvents: 'none',
+                    zIndex: '100', textShadow: '0 0 5px #e74c3c', whiteSpace: 'nowrap'
+                 });
                  logoTextContainer.appendChild(greetingText);
              }
 
-             // Animation function for the greeting text (only if it was created)
              function animateGreetingText() {
-                 if (!greetingText) return; // Don't run if greetingText doesn't exist
-
-                // Reset to starting visible position
-                greetingText.style.opacity = '0.8';
-                greetingText.style.top = '50%';
-                greetingText.style.left = '100%';
-                greetingText.style.marginLeft = '15px';
-
-                // Animation steps
-                setTimeout(() => {
-                    if(greetingText) {
-                        greetingText.style.top = '120%';
-                        greetingText.style.marginLeft = '35px';
-                    }
-                }, 1600);
-
-                setTimeout(() => {
-                     if(greetingText) {
-                        greetingText.style.top = '-20%';
-                        greetingText.style.marginLeft = '-5px';
-                     }
-                }, 3100);
-
-                setTimeout(() => {
-                     if(greetingText) {
-                         greetingText.style.opacity = '0';
-                     }
-                }, 4600);
-
-                // Reset position while hidden
-                setTimeout(() => {
-                     if(greetingText) {
-                        greetingText.style.top = '50%';
-                        greetingText.style.left = '100%';
-                        greetingText.style.marginLeft = '-50px';
-                        greetingText.style.opacity = '0';
-                     }
-                }, 4800);
-
-                 // Loop the animation
+                 if (!greetingText) return;
+                Object.assign(greetingText.style, { opacity: '0.8', top: '50%', left: '100%', marginLeft: '15px' });
+                setTimeout(() => { if(greetingText) Object.assign(greetingText.style, { top: '120%', marginLeft: '35px' }); }, 1600);
+                setTimeout(() => { if(greetingText) Object.assign(greetingText.style, { top: '-20%', marginLeft: '-5px' }); }, 3100);
+                setTimeout(() => { if(greetingText) greetingText.style.opacity = '0'; }, 4600);
+                setTimeout(() => { if(greetingText) Object.assign(greetingText.style, { top: '50%', left: '100%', marginLeft: '-50px', opacity: '0' }); }, 4800);
                 setTimeout(animateGreetingText, 7000);
              }
 
-             // --- Star Animation Logic ---
              function createFallingStar() {
-                 // Only create stars if the container exists
                  if (!starAnimationContainer) return;
-
                  const star = document.createElement('div');
                  star.innerHTML = '★';
-                 star.style.position = 'absolute';
-                 star.style.color = ['#FFD700', '#FF0000', '#00FF00', '#FFFFFF', '#FFA500', '#FF69B4', '#00FFFF', '#FF00FF'][Math.floor(Math.random() * 8)];
-                 star.style.fontSize = Math.random() * 15 + 10 + 'px';
-                 star.style.top = '-30px';
-                 star.style.left = Math.random() * (starAnimationContainer.offsetWidth + 40) - 20 + 'px'; // Relative to star container
-                 star.style.opacity = '0';
-                 star.style.transition = `all ${Math.random() * 1.5 + 1}s linear`;
-                 star.style.pointerEvents = 'none';
-                 star.style.zIndex = '90';
-                 star.style.transform = `rotate(${Math.random() * 360}deg)`;
-                 star.style.filter = 'drop-shadow(0 0 3px currentColor)';
-
-                 starAnimationContainer.appendChild(star); // Append to the star container
-
+                 Object.assign(star.style, {
+                     position: 'absolute',
+                     color: ['#FFD700', '#FF0000', '#00FF00', '#FFFFFF', '#FFA500', '#FF69B4', '#00FFFF', '#FF00FF'][Math.floor(Math.random() * 8)],
+                     fontSize: Math.random() * 15 + 10 + 'px', top: '-30px',
+                     left: Math.random() * (starAnimationContainer.offsetWidth + 40) - 20 + 'px',
+                     opacity: '0', transition: `all ${Math.random() * 1.5 + 1}s linear`,
+                     pointerEvents: 'none', zIndex: '90',
+                     transform: `rotate(${Math.random() * 360}deg)`,
+                     filter: 'drop-shadow(0 0 3px currentColor)'
+                 });
+                 starAnimationContainer.appendChild(star);
                  setTimeout(() => {
-                     star.style.opacity = '1';
-                     star.style.transform = `translateY(${starAnimationContainer.offsetHeight + 50}px) rotate(${Math.random() * 720 + 360}deg)`;
-                     star.style.opacity = '0';
+                    star.style.opacity = '1';
+                    star.style.transform = `translateY(${starAnimationContainer.offsetHeight + 50}px) rotate(${Math.random() * 720 + 360}deg)`;
+                    star.style.opacity = '0';
                  }, 10);
-
                  setTimeout(() => star.remove(), 3000);
              }
 
              function autoDropStars() {
-                  if (!starAnimationContainer) return; // Don't run if no container
-                 setInterval(() => {
-                     for (let i = 0; i < 2; i++) {
-                         setTimeout(createFallingStar, i * 150);
-                     }
-                 }, 800);
+                  if (!starAnimationContainer) return;
+                 setInterval(() => { for (let i = 0; i < 2; i++) setTimeout(createFallingStar, i * 150); }, 800);
              }
 
-             // Start animations (only if elements exist)
             if (greetingText) setTimeout(animateGreetingText, 1000);
             if (starAnimationContainer) setTimeout(autoDropStars, 500);
 
-
-             // Trigger stars on logo click (only if logo exists)
              if (logo) {
                  logo.addEventListener('click', function() {
-                     if (!starAnimationContainer) return; // Check again just in case
-                     for (let i = 0; i < 30; i++) {
-                         setTimeout(createFallingStar, i * 20);
-                     }
+                     if (!starAnimationContainer) return;
+                     for (let i = 0; i < 30; i++) setTimeout(createFallingStar, i * 20);
                  });
              }
          });
